@@ -5,14 +5,16 @@ import { MapView } from "expo";
 import { connect } from "react-redux";
 import * as actions from "../actions";
 
+const initialRegion = {
+  longitude: -122,
+  latitude: 37,
+  latitudeDelta: 0.01,
+  longitudeDelta: 0.0005
+};
+
 class MapScreen extends Component {
   state = {
-    region: {
-      longitude: -122,
-      latitude: 37,
-      longitudeDelta: 0.04,
-      latitudeDelta: 0.09
-    },
+    region: initialRegion,
     mapLoaded: false
   };
 
@@ -25,7 +27,9 @@ class MapScreen extends Component {
   };
 
   onButtonPress = () => {
-    this.props.fetchJobs(this.state.region);
+    this.props.fetchJobs(this.state.region, () => {
+      this.props.navigation.navigate("deck");
+    });
   };
 
   render() {
@@ -40,6 +44,7 @@ class MapScreen extends Component {
       <View style={{ flex: 1 }}>
         <MapView
           style={{ flex: 1 }}
+          initialRegion={initialRegion}
           region={this.state.region}
           onRegionChangeComplete={this.onRegionChangeComplete}
         />
