@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Linking, Platform } from "react-native";
 import { Button, Card } from "react-native-elements";
 import { connect } from "react-redux";
 import * as actions from "../actions";
+import { MapView } from "expo";
 
 class ReviewScreen extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -23,13 +24,40 @@ class ReviewScreen extends Component {
 
   renderLikedJobs() {
     return this.props.likedJobs.map(job => {
+      const {
+        jobkey,
+        jobtitle,
+        company,
+        formattedRelativeTime,
+        url,
+        longitude,
+        latitude
+      } = job;
+      const { detailWrapper, textStyle } = styles;
+      const initialRegion = {
+        latitude,
+        longitude,
+        latitudeDelta: 0.045,
+        longitudeDelta: 0.02
+      };
       return (
-        <Card key={job.jobkey}>
+        <Card key={jobkey} title={jobtitle}>
           <View style={{ height: 200 }}>
-            <View style={styles.detailWrapper}>
-              <Text style={styles.textStyle}>{job.company}</Text>
-              <Text style={styles.textStyle}>{job.formattedRelativeTime}</Text>
+            <MapView
+              style={{ flex: 1 }}
+              cacheEnabled={Platform.OS === "android"}
+              scrollEnabled={false}
+              initialRegion={initialRegion}
+            />
+            <View style={detailWrapper}>
+              <Text style={textStyle}>{company}</Text>
+              <Text style={textStyle}>{formattedRelativeTime}</Text>
             </View>
+            <Button
+              title="Apply Now"
+              backgroundColor="#03A9F4"
+              onPress={() => Linking.openURL(url)}
+            />
           </View>
         </Card>
       );
@@ -43,6 +71,7 @@ class ReviewScreen extends Component {
 
 const styles = {
   detailWrapper: {
+    marginTop: 10,
     marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-around"
